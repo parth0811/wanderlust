@@ -1,0 +1,217 @@
+<% layout("/layouts/boilerplate") %>
+
+<style>
+  .filter-bar-wrapper {
+    display: flex;
+    align-items: center;
+    padding: 1rem 2rem;
+    position: relative;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .filter-bar-container {
+    overflow: hidden;
+    flex: 1;
+    position: relative;
+  }
+
+  .filter-bar {
+    display: flex;
+    gap: 1.5rem;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+  }
+
+  .filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filters {
+    text-align: center;
+    opacity: 0.7;
+    min-width: 70px;
+    cursor: pointer;
+  }
+
+  .filters:hover {
+    opacity: 1;
+  }
+
+  .scroll-btn {
+    border: none;
+    background: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #444;
+  }
+
+  .filter-actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .tax-toggle {
+    border: 1px solid #ccc;
+    border-radius: 2rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .collapse-btn {
+    display: none;
+    background-color: #f8f9fa;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .mobile-collapse {
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+
+  @media (max-width: 768px) {
+    .filter-bar-wrapper {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .scroll-btn,
+    .filter-bar-container {
+      display: none;
+    }
+
+    .collapse-btn {
+      display: block;
+    }
+
+    .mobile-collapse {
+      display: none;
+    }
+
+    .mobile-collapse.show {
+      display: flex;
+    }
+  }
+</style>
+
+<!-- 🔽 FILTER SECTION -->
+<div class="filter-bar-wrapper">
+  <button class="collapse-btn" id="toggleCategories">Explore Categories ⌄</button>
+
+  <!-- Desktop Horizontal Scroll Filters -->
+  <button class="scroll-btn" id="scrollLeft">&#10094;</button>
+  <div class="filter-bar-container">
+    <div class="filter-bar" id="filterScroll">
+      <% const categories = [
+        { name: "Trending", icon: "fa-fire" },
+        { name: "Rooms", icon: "fa-bed" },
+        { name: "Iconic Cities", icon: "fa-mountain-city" },
+        { name: "Mountains", icon: "fa-mountain" },
+        { name: "Castles", icon: "fab fa-fort-awesome" },
+        { name: "Pools", icon: "fa-person-swimming" },
+        { name: "Camping", icon: "fa-campground" },
+        { name: "Farms", icon: "fa-cow" },
+        { name: "Arctic", icon: "fa-snowflake" },
+        { name: "Domes", icon: "fa-igloo" },
+        { name: "Boats", icon: "fa-ship" }
+      ]; %>
+      <% categories.forEach(cat => { %>
+        <div class="filters">
+          <i class="fa-solid <%= cat.icon %>"></i>
+          <p><%= cat.name %></p>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+  <button class="scroll-btn" id="scrollRight">&#10095;</button>
+
+  <!-- Filters + Tax Toggle -->
+  <div class="filter-actions">
+    <button class="btn btn-outline-secondary">
+      <i class="fa-solid fa-sliders"></i> Filters
+    </button>
+    <div class="tax-toggle">
+      <div class="form-check-reverse form-switch">
+  <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckDefault">
+  <label class="form-check-label" for="flexSwitchCheckDefault">Display total after taxes</label>
+</div>
+    </div>
+  </div>
+
+  <!-- Mobile Collapse Filters -->
+  <div class="mobile-collapse" id="mobileFilters">
+    <% categories.forEach(cat => { %>
+      <div class="filters">
+        <i class="fa-solid <%= cat.icon %>"></i>
+        <p><%= cat.name %></p>
+      </div>
+    <% }) %>
+  </div>
+</div>
+
+<!-- 🏠 LISTINGS -->
+<div class="row row-cols-lg-3 row-cols-md-2 row-cols-sm-1 mt-3">
+  <% for(let listing of allListings){ %>
+    <a href="/listings/<%= listing._id %>" class="listing link">
+      <div class="card col listing-card">
+        <img src="<%= listing.image?.url || listing.image %>" class="card-img-top" alt="listing_image"
+          style="height: 20rem;">
+        <div class="card-img-overlay"></div>
+        <div class="card-body">
+          <p class="card-text">
+            <b><%= listing.title %></b> <br />
+            ₹ <%= listing.price.toLocaleString("en-IN") %> / night
+            <i class="tax-info">&nbsp;&nbsp;+18% GST</i>
+          </p>
+        </div>
+      </div>
+    </a>
+  <% } %>
+</div>
+
+<!-- ✅ SCRIPT -->
+<script>
+  // Horizontal scroll buttons
+  const scrollLeftBtn = document.getElementById("scrollLeft");
+  const scrollRightBtn = document.getElementById("scrollRight");
+  const filterScroll = document.getElementById("filterScroll");
+
+  scrollLeftBtn?.addEventListener("click", () => {
+    filterScroll.scrollBy({ left: -200, behavior: "smooth" });
+  });
+
+  scrollRightBtn?.addEventListener("click", () => {
+    filterScroll.scrollBy({ left: 200, behavior: "smooth" });
+  });
+
+  // Tax toggle switch
+  const taxSwitch = document.getElementById("flexSwitchCheckDefault");
+  taxSwitch.addEventListener("click", () => {
+    const taxInfo = document.getElementsByClassName("tax-info");
+    for (let info of taxInfo) {
+      info.style.display = info.style.display === "inline" ? "none" : "inline";
+    }
+  });
+
+  // Mobile collapse toggle
+  const toggleBtn = document.getElementById("toggleCategories");
+  const mobileFilters = document.getElementById("mobileFilters");
+
+  toggleBtn.addEventListener("click", () => {
+    mobileFilters.classList.toggle("show");
+    toggleBtn.textContent = mobileFilters.classList.contains("show")
+      ? "Hide Categories ⌃"
+      : "Explore Categories ⌄";
+  });
+</script>
