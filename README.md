@@ -75,7 +75,9 @@ A full-stack accommodation booking platform inspired by Airbnb. Users can browse
 
 ### Listing Details
 
-![Listing Details](./screenshots/listing1.jpg)(./screenshots/listing2.jpg)
+![Listing 1](./screenshots/listing1.jpg)
+
+![Listing 2](./screenshots/listing2.jpg)
 
 ### Create Listing
 
